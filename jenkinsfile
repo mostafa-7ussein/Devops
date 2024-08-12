@@ -2,47 +2,29 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
-    }
-
-    stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
-                    userRemoteConfigs: [[url: 'https://github.com/mostafa-7ussein/Devops']]
-                ])
+        DOCKER_IMAGE='mostafahu/wordpress'
+        DOCKER_CREDENTIALS_ID='dockerhub'
+   
+   
+     }
+     
+     stage('Build'){
+        steps{
+            script{
+                dockerImage=docker.Build("${DOCKER_IMAGE}:${env.BUILD_ID}")
             }
         }
-
-        stage('Deploy with Docker Compose') {
-            steps {
-                script {
-                    // Print working directory and permissions for debugging
-                    sh 'echo "Current Directory: $(pwd)"'
-                    sh 'ls -la'
-
-                    try {
-                        sh 'docker-compose up -d'
-                    } catch (Exception e) {
-                        echo "Deployment failed: ${e.message}"
-                        error "Deployment failed!"
-                    }
+     }
+     stage('push'){
+        steps{
+            script{
+                docker.withRegistry('',"${DOCKER_CREDENTIALS_ID}"){
+                    dockerImage.push($env.BUILD_ID)
+                    ddockerImage.push("latest")
                 }
             }
         }
-    }
+     }
 
-    post {
-        always {
-            echo 'Cleaning up...'
-            sh 'docker-compose down || true'
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
-}
+      }
+ 
