@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -5,6 +6,47 @@ pipeline {
         DOCKER_REGISTRY = "mostafahu" // Replace with your Docker registry
         DOCKER_CREDENTIALS_ID = "mostafahu" // Replace with your Docker credentials ID
     }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    def customImage = docker.build("wordpress", "-f Dockerfile .")
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                script {
+                    docker.withRegistry("https://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIALS_ID}") {
+                        docker.image("wordpress").push("latest")
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker system prune -f'
+        }
+    }
+}
 
     stages {
         stage('Checkout') {
