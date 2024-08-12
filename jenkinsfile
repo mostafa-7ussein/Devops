@@ -6,26 +6,38 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                checkout scm
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/main']], 
+                    userRemoteConfigs: [[url: 'https://github.com/mostafa-7ussein/Devops']]
+                ])
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    // List files in the workspace to verify docker-compose.yml is present
+                    // Print working directory and permissions for debugging
+                    sh 'echo "Current Directory: $(pwd)"'
                     sh 'ls -la'
 
-                    // Start services using Docker Compose
-                    sh 'docker-compose up -d'
+                    try {
+                        sh 'docker-compose up -d'
+                    } catch (Exception e) {
+                        echo "Deployment failed: ${e.message}"
+                        error "Deployment failed!"
+                    }
                 }
             }
         }
     }
 
     post {
+        always {
+            echo 'Cleaning up...'
+            sh 'docker-compose down || true'
+        }
         success {
             echo 'Pipeline completed successfully!'
         }
