@@ -6,27 +6,19 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Image') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Build Docker image for WordPress
-                    sh 'docker build -t mywordpress:${BUILD_NUMBER} .'
-                }
+                checkout scm
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh 'echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin'
-                    sh 'docker push mywordpress:${BUILD_NUMBER}'
-                }
-            }
-        }
+                    // List files in the workspace to verify docker-compose.yml is present
+                    sh 'ls -la'
 
-        stage('Deploy') {
-            steps {
-                script {
+                    // Start services using Docker Compose
                     sh 'docker-compose up -d'
                 }
             }
