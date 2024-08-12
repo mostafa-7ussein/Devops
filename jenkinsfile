@@ -1,5 +1,5 @@
 
-pipeline {
+   pipeline {
     agent any
 
     environment {
@@ -43,49 +43,6 @@ pipeline {
 
     post {
         always {
-            sh 'docker system prune -f'
-        }
-    }
-}
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    docker.build('wordpress', '-f Dockerfile .')
-                }
-            }
-        }
-
-        stage('Push Docker Images') {
-            steps {
-                script {
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIALS_ID}") {
-                        docker.image('wordpress').push('latest')
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Here you would deploy your Docker images, possibly using docker-compose
-                    sh 'docker-compose up -d'
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            // Clean up
             sh 'docker system prune -f'
         }
     }
