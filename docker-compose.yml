@@ -16,21 +16,21 @@ services:
     image: wordpress:latest
     restart: always
     ports:
-      - "1040:80"
+      - "1115:80"
     environment:
       WORDPRESS_DB_HOST: mysql_database:3306
       WORDPRESS_DB_USER: wp_user
       WORDPRESS_DB_PASSWORD: 1234
       WORDPRESS_DB_NAME: wp_db
     volumes:
-      - /var/lib/jenkins/workspace/piplinewordpress/wordpress:/var/www/html 
+      - ./:/var/www/html
   phpmyadmin:
     depends_on:
       - mysql_database
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "1060:80"
+      - "1116:80"
     environment:
       PMA_HOST: mysql_database
       MYSQL_ROOT_PASSWORD: 1234
