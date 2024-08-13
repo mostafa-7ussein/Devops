@@ -23,14 +23,14 @@ services:
       WORDPRESS_DB_PASSWORD: 1234
       WORDPRESS_DB_NAME: wp_db
     volumes:
-      - ./:/var/www/html
+      - ./wordpress:/var/www/html
   phpmyadmin:
     depends_on:
       - mysql_database
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "1050:80"
+      - "1060:80"
     environment:
       PMA_HOST: mysql_database
       MYSQL_ROOT_PASSWORD: 1234
