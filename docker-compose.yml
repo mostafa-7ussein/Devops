@@ -16,7 +16,7 @@ services:
     image: wordpress:latest
     restart: always
     ports:
-      - ":80"
+      - "1030:80"
     environment:
       WORDPRESS_DB_HOST: mysql_database:3306
       WORDPRESS_DB_USER: wp_user
@@ -30,7 +30,7 @@ services:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - ":80"
+      - "1020:80"
     environment:
       PMA_HOST: mysql_database
       MYSQL_ROOT_PASSWORD: 1234
