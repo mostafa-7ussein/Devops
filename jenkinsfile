@@ -1,12 +1,47 @@
-
-   pipeline {
+pipeline {
     agent any
 
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('mostafahu') // Replace with your Jenkins credentials ID
+        DOCKER_IMAGE = 'mostafahu/my-repo'   // Replace with your Docker Hub username and repo name
+    }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
+
+        stage('Tag') {
+            steps {
+                script {
+                    sh "docker tag your-local-image-name ${DOCKER_IMAGE}:latest"  // Replace with your local image name
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    sh "docker push ${DOCKER_IMAGE}:latest"
+                }
             }
         }
 
